@@ -1,4 +1,4 @@
-const http = require('http');
+const http = require("http");
 
 const server = http.createServer((req, res) => {
   console.log(`${req.method} ${req.url}`);
@@ -10,9 +10,15 @@ const server = http.createServer((req, res) => {
 
   req.on("end", () => {
     // Parse the body of the request as JSON if Content-Type header is
-      // application/json
+    // application/json
+    if (req.headers["content-type"] === "application/json") {
+      JSON.parse(reqBody);
+    }
     // Parse the body of the request as x-www-form-urlencoded if Content-Type
-      // header is x-www-form-urlencoded
+    // header is x-www-form-urlencoded
+    if (req.headers["content-type"] === "x-www-form-urlencoded") {
+      JSON.stringify(resBody);
+    }
     if (reqBody) {
       req.body = reqBody
         .split("&")
@@ -29,7 +35,7 @@ const server = http.createServer((req, res) => {
     }
 
     const resBody = {
-      "Hello": "World!"
+      Hello: "World!",
     };
 
     // Return the `resBody` object as JSON in the body of the response
@@ -38,4 +44,4 @@ const server = http.createServer((req, res) => {
 
 const port = 5000;
 
-server.listen(port, () => console.log('Server is listening on port', port));
+server.listen(port, () => console.log("Server is listening on port", port));
