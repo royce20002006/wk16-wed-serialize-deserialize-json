@@ -9,38 +9,40 @@ const server = http.createServer((req, res) => {
   });
 
   req.on("end", () => {
-    // Parse the body of the request as JSON if Content-Type header is
-    // application/json
+    let parsedBody;
+    
     if (req.headers["content-type"] === "application/json") {
-      JSON.parse(reqBody);
+  
+        parsedBody = JSON.parse(reqBody);
+      
+    } else if (req.headers["content-type"] === "application/x-www-form-urlencoded") {
+      parsedBody = parseFormUrlEncoded(reqBody);
     }
-    // Parse the body of the request as x-www-form-urlencoded if Content-Type
-    // header is x-www-form-urlencoded
-    if (req.headers["content-type"] === "x-www-form-urlencoded") {
-      JSON.stringify(resBody);
-    }
-    if (reqBody) {
-      req.body = reqBody
-        .split("&")
-        .map((keyValuePair) => keyValuePair.split("="))
-        .map(([key, value]) => [key, value.replace(/\+/g, " ")])
-        .map(([key, value]) => [key, decodeURIComponent(value)])
-        .reduce((acc, [key, value]) => {
-          acc[key] = value;
-          return acc;
-        }, {});
-
-      // Log the body of the request to the terminal
-      console.log(req.body);
+    
+    if (parsedBody) {
+      console.log(parsedBody);
     }
 
     const resBody = {
       Hello: "World!",
     };
 
-    // Return the `resBody` object as JSON in the body of the response
+    res.setHeader("Content-Type", "application/json");
+    res.end(JSON.stringify(resBody));
   });
 });
+
+function parseFormUrlEncoded(body) {
+  return body
+    .split("&")
+    .map((keyValuePair) => keyValuePair.split("="))
+    .map(([key, value]) => [key, value.replace(/\+/g, " ")])
+    .map(([key, value]) => [key, decodeURIComponent(value)])
+    .reduce((acc, [key, value]) => {
+      acc[key] = value;
+      return acc;
+    }, {});
+}
 
 const port = 5000;
 
